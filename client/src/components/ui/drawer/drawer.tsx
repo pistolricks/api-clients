@@ -1,7 +1,7 @@
 import Drawer from '@corvu/drawer'
 import DrawerPrimitive, {type ContentProps, type DynamicProps} from '@corvu/drawer'
-import {Accessor, Index, type JSX, JSXElement, splitProps, type ValidComponent} from "solid-js";
-import {cn} from "~/lib/utils";
+import {Accessor, Index, type JSX, JSXElement, Setter, splitProps, type ValidComponent} from "solid-js";
+import {classNames, cn} from "~/lib/utils";
 
 
 
@@ -9,6 +9,8 @@ type PROPS = {
     children?: JSXElement
     contextId: string,
     class?: string,
+    open?: boolean,
+    setOpen?: Setter<boolean>,
     side?: 'top' | 'right' | 'bottom' | 'left'
 }
 
@@ -16,9 +18,16 @@ function BaseDrawer(props: PROPS) {
     const side = () => props.side ?? "right";
     const contextId = () => props.contextId;
     const children = () => props.children;
+    const open = () => props.open;
 
+    let sides = {
+        top: "fixed w-full inset-x-0 top-0 z-10 flex h-full after:absolute after:inset-x-0 after:top-[calc(100%-1px)] after:h-1/2 z-10 flex flex-col pt-3 after:bg-inherit data-transitioning:transition-transform data-transitioning:duration-500 data-transitioning:ease-[cubic-bezier(0.32,0.72,0,1)] md:select-none",
+        right: "fixed inset-y-0 right-0 z-10 w-screen md:max-w-md flex h-screen flex-col after:bg-inherit data-transitioning:transition-transform data-transitioning:duration-500 data-transitioning:ease-[cubic-bezier(0.32,0.72,0,1)] md:select-none",
+        bottom: "fixed w-full inset-x-0 bottom-0 z-10 flex h-full border-t-2  rounded-t-lg after:absolute after:inset-x-0 after:top-[calc(100%-1px)] after:h-1/2 z-10 flex flex-col pt-3 after:bg-inherit data-transitioning:transition-transform data-transitioning:duration-500 data-transitioning:ease-[cubic-bezier(0.32,0.72,0,1)] md:select-none",
+        left: "fixed inset-y-0 left-0 z-10 w-screen md:max-w-md flex h-screen flex-col after:bg-inherit data-transitioning:transition-transform data-transitioning:duration-500 data-transitioning:ease-[cubic-bezier(0.32,0.72,0,1)] md:select-none",
+    }[side() as 'top' | 'right' | 'bottom' | 'left'];
     return (
-        <DrawerPrimitive contextId={contextId()} breakPoints={[0.75]} side={side()}>
+        <DrawerPrimitive open={open()} onOpenChange={props.setOpen} noOutsidePointerEvents={false} closeOnOutsidePointer={false} contextId={contextId()} breakPoints={[0.75]} side={side()}>
             {(props) => (
                 <>
 
@@ -27,7 +36,10 @@ function BaseDrawer(props: PROPS) {
                     <Drawer.Portal contextId={contextId()}>
                         <Drawer.Overlay
                             contextId={contextId()}
-                            class="fixed h-sc inset-0 z-40 data-transitioning:transition-colors data-transitioning:duration-500 data-transitioning:ease-[cubic-bezier(0.32,0.72,0,1)]"
+                            class={
+                            classNames(
+                                sides,
+                            "data-transitioning:transition-colors data-transitioning:duration-500 data-transitioning:ease-[cubic-bezier(0.32,0.72,0,1)]")}
                             style={{
                                 'background-color': `rgb(0 0 0 / ${
                                     0.5 * props.openPercentage

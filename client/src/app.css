@@ -4,7 +4,7 @@ body, html {
   margin: 0;
   height: 100%;
   width: 100%;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+  font-family: -Roboto, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
   'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
   sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -40,7 +40,7 @@ body, html {
 
 .school-popup {
   background-color: white;
-  padding: 10px;
+  
   border-radius: 5px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   max-width: 300px;
@@ -95,7 +95,88 @@ body, html {
   }
 }
 
-body {
-  background: rgb(var(--background-rgb));
-  color: rgb(var(--foreground-rgb));
+
+
+:root {
+
+  --color-bgBase: hsl(39deg 85% 95%);
+  --color-content: hsl(0deg 0% 20%);
+  --color-primary-100: hsl(197, 37%, 96%);
+  --color-primary-200: hsl(192, 31%, 90%);
+  --color-primary-300: hsl(196, 29%, 82%);
+  --color-primary-400: hsl(195, 29%, 65%);
+  --color-primary-500: hsl(196, 27%, 53%);
+  --color-primary-600: hsl(197, 30%, 43%);
+  --color-primary-700: hsl(200, 29%, 36%);
+  --color-primary-800: hsl(201, 27%, 31%);
+  --color-primary-900: hsl(202, 22%, 27%);
+
+
+  --color-cerulean-blue-50: hsl(203, 100%, 96%);
+  --color-cerulean-blue-100: hsl(206, 100%, 92%);
+  --color-cerulean-blue-200: hsl(205, 100%, 86%);
+  --color-cerulean-blue-300: hsl(203, 100%, 76%);
+  --color-cerulean-blue-400: hsl(205, 100%, 65%);
+  --color-cerulean-blue-500: hsl(210, 100%, 56%);
+  --color-cerulean-blue-600: hsl(215, 100%, 52%);
+  --color-cerulean-blue-700: hsl(218, 98%, 48%);
+  --color-cerulean-blue-800: hsl(220, 90%, 40%);
+  --color-cerulean-blue-900: hsl(219, 82%, 33%);
+  --color-cerulean-blue-950: hsl(221, 72%, 21%);
+
+  --color-glacier-50: hsl(197, 37%, 96%);
+  --color-glacier-100: hsl(192, 31%, 90%);
+  --color-glacier-200: hsl(196, 29%, 82%);
+  --color-glacier-300: hsl(195, 29%, 65%);
+  --color-glacier-400: hsl(196, 27%, 53%);
+  --color-glacier-500: hsl(197, 30%, 43%);
+  --color-glacier-600: hsl(200, 29%, 36%);
+  --color-glacier-700: hsl(201, 27%, 31%);
+  --color-glacier-800: hsl(202, 22%, 27%);
+  --color-glacier-900: hsl(204, 21%, 24%);
+  --color-glacier-950: hsl(203, 24%, 15%);
+
+  --color-red-orange-50: hsl(4, 100%, 97%);
+  --color-red-orange-100: hsl(6, 100%, 94%);
+  --color-red-orange-200: hsl(5, 100%, 89%);
+  --color-red-orange-300: hsl(5, 100%, 81%);
+  --color-red-orange-400: hsl(5, 100%, 70%);
+  --color-red-orange-500: hsl(5, 96%, 57%);
+  --color-red-orange-600: hsl(5, 83%, 51%);
+  --color-red-orange-700: hsl(5, 84%, 42%);
+  --color-red-orange-800: hsl(5, 80%, 35%);
+  --color-red-orange-900: hsl(5, 72%, 31%);
+  --color-red-orange-950: hsl(4, 85%, 15%);
+
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --color-bgBase: 240deg 27% 18%;
+      --color-content: 210deg 14% 53%;
+    }
+  }
+
+  /* If the user switchs dark mode */
+
+  :root[data-theme="dark"] {
+    --color-bgBase: 240deg 27% 18%;
+    --color-content: 210deg 14% 53%;
+  }
+
+  /* If the user switchs light mode */
+
+  :root[data-theme="light"] {
+    --color-bgBase: 39deg 85% 95%;
+    --color-content: 0deg 0% 20%;
+  }
+
+}
+
+@theme inline {
+  --color-corvu-text: var(--color-cerulean-blue-950);
+  --color-corvu-bg: var(--color-white);
+  --color-corvu-100: var(--color-cerulean-blue-50);
+  --color-corvu-200: var(--color-cerulean-blue-200);
+  --color-corvu-300: var(--color-cerulean-blue-300);
+  --color-corvu-400: var(--color-cerulean-blue-400);
 }

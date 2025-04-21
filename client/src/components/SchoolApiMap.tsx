@@ -1,4 +1,4 @@
-import { createSignal, onMount, onCleanup, Show, createEffect, Component } from 'solid-js';
+import {Component, createEffect, createSignal, onMount, Show} from 'solid-js';
 import Map from 'ol/Map';
 import View from 'ol/View';
 import TileLayer from 'ol/layer/Tile';
@@ -7,12 +7,14 @@ import VectorSource from 'ol/source/Vector';
 import OSM from 'ol/source/OSM';
 import Feature from 'ol/Feature';
 import Point from 'ol/geom/Point';
-import { fromLonLat } from 'ol/proj';
-import { Style, Circle, Fill, Stroke, Text } from 'ol/style';
+import {fromLonLat} from 'ol/proj';
+import {Circle, Fill, Stroke, Style, Text} from 'ol/style';
 import Overlay from 'ol/Overlay';
-import { School, SchoolsResponse } from '~/types';
+import {School, SchoolsResponse} from '~/types';
 import 'ol/ol.css';
-import {DrawerContent} from "~/components/ui/drawer/drawer";
+import BaseDrawer, {DrawerContent} from "~/components/ui/drawer/drawer";
+import {SchoolDetails} from "~/components/schools/details";
+import Icon from "~/components/ui/icon";
 
 
 const MapComponent: Component = () => {
@@ -23,7 +25,7 @@ const MapComponent: Component = () => {
     const [pageSize, setPageSize] = createSignal<number>(100);
     const [total, setTotal] = createSignal<number>(0);
     const [selectedSchool, setSelectedSchool] = createSignal<School | null>(null);
-
+    const [getOpen, setOpen] = createSignal(false);
     let mapElement: HTMLDivElement | undefined;
     let popupElement: HTMLDivElement | undefined;
     let map: Map | undefined;
@@ -71,15 +73,15 @@ const MapComponent: Component = () => {
             feature.setStyle(new Style({
                 image: new Circle({
                     radius: 6,
-                    fill: new Fill({ color: '#007bff' }),
-                    stroke: new Stroke({ color: '#ffffff', width: 2 })
+                    fill: new Fill({color: '#007bff'}),
+                    stroke: new Stroke({color: '#ffffff', width: 2})
                 }),
                 text: new Text({
                     text: school.name,
                     offsetY: -15,
                     font: '12px Calibri,sans-serif',
-                    fill: new Fill({ color: '#000' }),
-                    stroke: new Stroke({ color: '#fff', width: 3 })
+                    fill: new Fill({color: '#000'}),
+                    stroke: new Stroke({color: '#fff', width: 3})
                 })
             }));
 
@@ -111,8 +113,10 @@ const MapComponent: Component = () => {
 
     const showSchoolPopup = (school: School, coordinate: number[]): void => {
         setSelectedSchool(school);
+        setOpen(true);
         if (popup) {
             popup.setPosition(coordinate);
+
         }
     };
 
@@ -161,6 +165,7 @@ const MapComponent: Component = () => {
                         }
                     } else {
                         setSelectedSchool(null);
+                        setOpen(false);
                         if (popup) {
                             popup.setPosition(undefined);
                         }
@@ -179,13 +184,21 @@ const MapComponent: Component = () => {
             fetchSchools();
         };
 
+
         // Create a computed signal that depends on page
         createEffect(() => {
             page();
             pageWatcher();
+
+
         });
 
         // No need for manual disposal as onCleanup will handle it automatically
+    });
+
+
+    createEffect(() => {
+        console.log("open", getOpen())
     });
 
     return (
@@ -195,57 +208,73 @@ const MapComponent: Component = () => {
                     <div class="error">{error()}</div>
                 </Show>
             </div>
+            <BaseDrawer open={getOpen()} setOpen={setOpen} side={"right"} contextId={'map-drawer'}>
+                <DrawerContent class={''} side="right" contextId={'map-drawer'}>
+                    {selectedSchool() && <SchoolDetails {...selectedSchool()!} />}
+                </DrawerContent>
 
-            <DrawerContent contextId={'map-drawer'}>
-                TEST
-            </DrawerContent>
+                <div class="map-container">
+                    <div ref={mapElement} class="ol-map"></div>
+                    <div ref={popupElement} class="school-popup flex flex-col" style={{display: selectedSchool() ? 'block' : 'none'}}>
+                        <Show when={selectedSchool()}>
+                            <div class="col-span-1 divide-y divide-gray-200 rounded-lg bg-white shadow">
+                                <div class="flex w-full items-center justify-between space-x-6 p-6">
+                                    <div class="flex-1 truncate">
+                                        <div class="flex items-center space-x-3">
+                                            <h3 class="truncate text-sm font-medium text-gray-900">{selectedSchool()!.name}</h3>
 
-            <div class="map-container ">
-                <div ref={mapElement} class="ol-map"></div>
-                <div ref={popupElement} class="school-popup" style={{ display: selectedSchool() ? 'block' : 'none' }}>
-                    <Show when={selectedSchool()}>
-                        <h3>{selectedSchool()!.name}</h3>
-                        <p><strong>Address:</strong> {selectedSchool()!.address}, {selectedSchool()!.city}, {selectedSchool()!.state} {selectedSchool()!.zip}</p>
-                        <p><strong>Type:</strong> {selectedSchool()!.level || 'N/A'}</p>
-                        <p><strong>Enrollment:</strong> {selectedSchool()!.enrollment || 'N/A'}</p>
-                        <p><strong>Coordinates:</strong> {selectedSchool()!.latitude.toFixed(6)}, {selectedSchool()!.longitude.toFixed(6)}</p>
-                        <p>{selectedSchool()!.id}</p>
+                                        </div>
+                                        <p class="mt-1 truncate text-sm text-gray-500">{selectedSchool()!.address}</p>
+                                        <p class="text-sm capitalize leading-6 tracking-wide">{selectedSchool()!.city!.toLowerCase()}, {selectedSchool()!.state}</p>
 
-                        <p>{selectedSchool()!.country}</p>
-                        <p>{selectedSchool()!.county}</p>
-                        <p>{selectedSchool()!.countyfips}</p>
-                        <p>{selectedSchool()!.latitude}</p>
-                        <p>{selectedSchool()!.longitude}</p>
-                        <p>{selectedSchool()!.level}</p>
-                        <p>{selectedSchool()!.st_grade}</p>
-                        <p>{selectedSchool()!.end_grade}</p>
-                        <p>{selectedSchool()!.enrollment}</p>
-                        <p>{selectedSchool()!.ft_teacher}</p>
-                        <p>{selectedSchool()!.type}</p>
-                        <p>{selectedSchool()!.status}</p>
-                        <p>{selectedSchool()!.population}</p>
-                        <p>{selectedSchool()!.ncesid}</p>
-                        <p>{selectedSchool()!.districtid}</p>
-                        <p>{selectedSchool()!.naics_code}</p>
-                        <p>{selectedSchool()!.naics_desc}</p>
-                        <p>{selectedSchool()!.website}</p>
-                        <p>{selectedSchool()!.telephone}</p>
-                        <p>{selectedSchool()!.sourcedate}</p>
-                        <p>{selectedSchool()!.val_date}</p>
-                        <p>{selectedSchool()!.val_method}</p>
-                        <p>{selectedSchool()!.source}</p>
-                        <p>{selectedSchool()!.shelter_id}</p>
-                        <p>{selectedSchool()!.created_at}</p>
-                        <p>{selectedSchool()!.updated_at}</p>
-                    </Show>
+                                    </div>
+
+                                </div>
+                                <div>
+                                    <div class="-mt-px flex divide-x divide-gray-200">
+                                        <div class="flex w-0 flex-1">
+                                            <a target={"_blank"} href={selectedSchool()!.website}
+                                               class="relative -mr-px inline-flex w-0 flex-1 items-center justify-center gap-x-3 rounded-bl-lg border border-transparent py-4 text-sm font-semibold text-gray-900">
+                                                <Icon name={"Globe"} class="size-5 text-gray-400" />
+
+                                            </a>
+                                        </div>
+                                        <div class="flex w-0 flex-1">
+                                            <a target={"_blank"} href={selectedSchool()!.source}
+                                               class="relative -mr-px inline-flex w-0 flex-1 items-center justify-center gap-x-3 rounded-bl-lg border border-transparent py-4 text-sm font-semibold text-gray-900">
+                                                <Icon name={"Info"} class="size-5 text-gray-400" />
+
+                                            </a>
+                                        </div>
+                                        <div class="-ml-px flex w-0 flex-1">
+                                            <a href={`tel:+1-${selectedSchool()!.telephone}`}
+                                               class="relative inline-flex w-0 flex-1 items-center justify-center gap-x-3 rounded-br-lg border border-transparent py-4 text-sm font-semibold text-gray-900">
+                                                <svg class="size-5 text-gray-400" viewBox="0 0 20 20"
+                                                     fill="currentColor" aria-hidden="true" data-slot="icon">
+                                                    <path fill-rule="evenodd"
+                                                          d="M2 3.5A1.5 1.5 0 0 1 3.5 2h1.148a1.5 1.5 0 0 1 1.465 1.175l.716 3.223a1.5 1.5 0 0 1-1.052 1.767l-.933.267c-.41.117-.643.555-.48.95a11.542 11.542 0 0 0 6.254 6.254c.395.163.833-.07.95-.48l.267-.933a1.5 1.5 0 0 1 1.767-1.052l3.223.716A1.5 1.5 0 0 1 18 15.352V16.5a1.5 1.5 0 0 1-1.5 1.5H15c-1.149 0-2.263-.15-3.326-.43A13.022 13.022 0 0 1 2.43 8.326 13.019 13.019 0 0 1 2 5V3.5Z"
+                                                          clip-rule="evenodd"/>
+                                                </svg>
+
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+
+                        </Show>
+                    </div>
                 </div>
-            </div>
 
-            <div class="pagination absolute bottom-0 left-0 right-0">
-                <button onClick={handlePrevPage} disabled={page() === 1 || loading()}>Previous</button>
-                <span>Page {page()} of {Math.ceil(total() / pageSize())}</span>
-                <button onClick={handleNextPage} disabled={page() * pageSize() >= total() || loading()}>Next</button>
-            </div>
+                <div class="pagination absolute bottom-0 left-0 right-0">
+                    <button onClick={handlePrevPage} disabled={page() === 1 || loading()}>Previous</button>
+                    <span>Page {page()} of {Math.ceil(total() / pageSize())}</span>
+                    <button onClick={handleNextPage} disabled={page() * pageSize() >= total() || loading()}>Next
+                    </button>
+                </div>
+            </BaseDrawer>
         </div>
     );
 };
