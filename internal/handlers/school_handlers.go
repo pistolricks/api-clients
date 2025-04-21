@@ -32,11 +32,8 @@ func (h *SchoolHandler) GetSchools(w http.ResponseWriter, r *http.Request) {
 		pageSize = 200
 	}
 
-	city := r.URL.Query().Get("city")
-	state := r.URL.Query().Get("state")
-
 	// Get schools from repository
-	schools, err := h.Repo.List(page, pageSize, city, state)
+	schools, err := h.Repo.List(page, pageSize)
 	if err != nil {
 		http.Error(w, "Error retrieving schools: "+err.Error(), http.StatusInternalServerError)
 		return

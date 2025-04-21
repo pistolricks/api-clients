@@ -126,7 +126,7 @@ func (r *SchoolRepository) GetByObjectID(objectID int) (*models.School, error) {
 }
 
 // List retrieves all schools with pagination
-func (r *SchoolRepository) List(page, pageSize int, city string, state string) ([]*models.School, error) {
+func (r *SchoolRepository) List(page, pageSize int) ([]*models.School, error) {
 	if page < 1 {
 		page = 1
 	}
@@ -143,8 +143,6 @@ func (r *SchoolRepository) List(page, pageSize int, city string, state string) (
 		website, telephone, sourcedate, val_date, val_method, source, shelter_id,
 		created_at, updated_at
 	FROM schools
-	WHERE (to_tsvector('simple', city) @@ plainto_tsquery('simple', $3) OR $3 = '')
-	AND (to_tsvector('simple', state) @@ plainto_tsquery('simple', $4) OR $4 = '')
 	ORDER BY id
 	LIMIT $1 OFFSET $2
 	`
