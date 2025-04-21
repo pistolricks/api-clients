@@ -165,7 +165,7 @@ const MapComponent: Component = () => {
                         }
                     } else {
                         setSelectedSchool(null);
-                        setOpen(false);
+                        
                         if (popup) {
                             popup.setPosition(undefined);
                         }
