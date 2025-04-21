@@ -54,11 +54,30 @@ func main() {
 	schools.HandleFunc("/{id:[0-9]+}", schoolHandler.DeleteSchool).Methods("DELETE")
 	schools.HandleFunc("/import", schoolHandler.ImportGeoJSON).Methods("POST")
 
+	// Add CORS middleware
+	corsMiddleware := func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Set("Access-Control-Allow-Origin", "*")
+			w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+			w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+
+			if r.Method == "OPTIONS" {
+				w.WriteHeader(http.StatusOK)
+				return
+			}
+
+			next.ServeHTTP(w, r)
+		})
+	}
+
+	// Apply CORS middleware
+	handler := corsMiddleware(r)
+
 	// Set up server
 	port := getEnv("PORT", "8080")
 	srv := &http.Server{
 		Addr:         ":" + port,
-		Handler:      r,
+		Handler:      handler,
 		ReadTimeout:  15 * time.Second,
 		WriteTimeout: 15 * time.Second,
 		IdleTimeout:  60 * time.Second,

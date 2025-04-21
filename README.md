@@ -1,14 +1,21 @@
 # US Public Schools API
 
-A CRUD API for US public schools data using PostgreSQL.
+A CRUD API for US public schools data using PostgreSQL with a SolidJS client for displaying schools on a map using OpenLayers.
 
 ## Prerequisites
 
+For the API:
 - Go 1.24 or higher
 - PostgreSQL 12 or higher with PostGIS extension
 - Git
 
+For the client:
+- Node.js 14 or higher
+- npm or yarn
+
 ## Setup
+
+### API Setup
 
 1. Clone the repository:
    ```
@@ -16,7 +23,7 @@ A CRUD API for US public schools data using PostgreSQL.
    cd api-clients
    ```
 
-2. Install dependencies:
+2. Install Go dependencies:
    ```
    go mod download
    ```
@@ -26,9 +33,42 @@ A CRUD API for US public schools data using PostgreSQL.
    - Make sure the PostGIS extension is installed
    - Update the `.env` file with your database credentials if needed
 
-4. Run the application:
+4. Run the API:
    ```
    go run cmd/api/main.go
+   ```
+   or using the Makefile:
+   ```
+   make run/api
+   ```
+
+### Client Setup
+
+1. Install client dependencies:
+   ```
+   make client/install
+   ```
+   or
+   ```
+   cd client
+   npm install
+   ```
+
+2. Run the client:
+   ```
+   make client/dev
+   ```
+   or
+   ```
+   cd client
+   npm run dev
+   ```
+
+   The client will be accessible at http://localhost:3003
+
+3. To run both the API and client concurrently:
+   ```
+   make run/all
    ```
 
 ## Environment Variables
@@ -153,3 +193,31 @@ POST /api/schools/import
 ```
 
 This will import all schools from the `us-public-schools.geojson` file.
+
+## Client Application
+
+The project includes a SolidJS client application that displays schools on a map using OpenLayers. The client runs on port 3003 and can be accessed at http://localhost:3003 when started.
+
+### Client Features
+
+- Interactive map displaying school locations
+- Click on a school marker to view details
+- Pagination to navigate through all schools
+- Responsive design for desktop and mobile devices
+
+### Building for Production
+
+To build the client for production using the Makefile:
+
+```
+make client/build
+```
+
+Or using npm directly:
+
+```
+cd client
+npm run build
+```
+
+The built files will be in the `client/dist` directory and can be served by any static file server.
